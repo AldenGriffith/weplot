@@ -590,8 +590,8 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   
   
   
-  print(xlab)
-  print(ylab)
+  # print(xlab)
+  # print(ylab)
   
   #remove backticks from axis labels if given data frame
   #also add spaces around operators
