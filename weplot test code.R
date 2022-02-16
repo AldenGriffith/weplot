@@ -15,8 +15,12 @@ weplot(data = Glacier, x = "Site", y = Size2,
        group = "Location", type = "bar", error = "se")
 
 
+weplot(x = Elec.Observed.W, type = "point")
+
 weplot(x = Hub$Date, y = list(Hub$`Precip pH`, Hub$`Stream pH`))
 
+
+weplot(x = Elec.Observed.W, type = "hist")
 
 weplot(x = Hour, y = list(Elec.Observed.W, Solar.Radiation.Wm2),
        type = "point")

@@ -6,6 +6,33 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
                    commas = ""){
   
   
+  # setwd("~/Wellesley Courses/ES 220/ES 220 S22/Labs/WePlot")
+  # Glacier <- read_csv("Glacier Data Stacked.csv")
+  # 
+  #   x = Glacier$Size1
+  #   y = Glacier$Size2
+  #   data = NULL
+  #   group = FALSE
+  #   group.type = "color"
+  #   ylab = NULL
+  #   xlab = NULL
+  #   group.lab = NULL
+  #   type = "point"
+  #   color = NULL
+  #   edge.color = "black"
+  #   transparency = 0
+  #   xlim = NULL
+  #   ylim = NULL
+  #   bins = NULL
+  #   log = ""
+  #   title = NULL
+  #   give.data = FALSE
+  #   commas = ""
+  
+  
+  # overlay <<- list
+  # aoverlay <<- overlay
+  
   # # # Yes, the code below is UGLY, but it works...  # # #
   
   

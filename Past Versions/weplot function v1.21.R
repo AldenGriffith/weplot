@@ -26,16 +26,6 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   
   # print(args)
   # print(arg.names)
-  input <- gsub(" ", "", deparse(sys.call()))
-  # print(input)
-  # print(deparse(match.call()))
-  
-  
-  #if no y, but x is explicitly specified, do histogram (only if type not specified)
-  if (any(grepl("x=", input), grepl("x<-", input)) & !is.element("y", arg.names)){
-    if (missing(type)) type <- "hist"
-    
-  }
   
   
   
@@ -971,7 +961,7 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "both",
 
 
 
-message('-- weplot loaded (version 1.22) --')
+message('-- weplot loaded (version 1.21) --')
 
 
 
