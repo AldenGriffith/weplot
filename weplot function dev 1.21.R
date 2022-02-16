@@ -51,51 +51,8 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   #keeps the arguments separate
   args <- as.character(args)  #actual input values
   
-  
-  
-  
-  ### need to make sure there are backticks in x and y vars that have spaces
-  i <- which(is.element(arg.names, c("x", "y"))) #might not always be 1st and 2nd (not always both!)
-  
-  args.XY <- args[i]
-  
-  #some operators automatically have spaces around them (will cause problems below!) also, users might put in spaces
-  for (ii in 1:length(args.XY)){
-    
-    args.XY[ii] <- gsub(" \\+ ", "\\+", args.XY[ii])
-    args.XY[ii] <- gsub(" \\- ", "\\-", args.XY[ii])
-    args.XY[ii] <- gsub(" \\* ", "\\*", args.XY[ii])
-    args.XY[ii] <- gsub(" \\/ ", "\\/", args.XY[ii])
-    args.XY[ii] <- gsub(" \\^ ", "\\^", args.XY[ii])
-    
-  }
-
-  
-  #assume any args that have back ticks are specified properly
-  i.noback <- which(is.na(rowSums(str_locate(args.XY, "`"))))
-  args.xy <- args.XY[i.noback]
-  
-
-  
-  #if no backticks are included in x or y
-  if (length(args.xy) > 0){
-    
-    #find args with functions
-    #if there's quotes within, replace with back ticks (fixes spaces)
-    i.fun <- which(!is.na(rowSums(str_locate(args.xy, '\"'))))
-    
-    for (j in i.fun) args.xy[j] <- gsub('\"', "`", args.xy[j])
-    
-    #finds args that aren't functions by which have spaces
-    i.space <- which(!is.na(rowSums(str_locate(args.xy, " ")))) #which have spaces
-    i.space <- i.space[!is.element(i.space, i.fun)] #removes args with spaces that are within functions - already fixed above
-    args.xy[i.space] <- paste0("`", args.xy[i.space], "`") #back ticks around arg
-    
-    args.XY[i.noback] <- args.xy
-    args[i] <- args.XY
-    
-    
-  }
+  # print(args)
+  # print(arg.names)
   
   
   
@@ -123,6 +80,55 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   
   if (!is.null(data)){
     #Data frame provided----
+    
+    
+    
+    
+    ### need to make sure there are backticks in x and y vars that have spaces
+    i <- which(is.element(arg.names, c("x", "y"))) #might not always be 1st and 2nd (not always both!)
+    
+    args.XY <- args[i]
+    
+    #some operators automatically have spaces around them (will cause problems below!) also, users might put in spaces
+    for (ii in 1:length(args.XY)){
+      
+      args.XY[ii] <- gsub(" \\+ ", "\\+", args.XY[ii])
+      args.XY[ii] <- gsub(" \\- ", "\\-", args.XY[ii])
+      args.XY[ii] <- gsub(" \\* ", "\\*", args.XY[ii])
+      args.XY[ii] <- gsub(" \\/ ", "\\/", args.XY[ii])
+      args.XY[ii] <- gsub(" \\^ ", "\\^", args.XY[ii])
+      
+    }
+    
+    
+    #assume any args that have back ticks are specified properly
+    i.noback <- which(is.na(rowSums(str_locate(args.XY, "`"))))
+    args.xy <- args.XY[i.noback]
+    
+    
+    
+    #if no backticks are included in x or y
+    if (length(args.xy) > 0){
+      
+      #find args with functions
+      #if there's quotes within, replace with back ticks (fixes spaces)
+      i.fun <- which(!is.na(rowSums(str_locate(args.xy, '\"'))))
+      
+      for (j in i.fun) args.xy[j] <- gsub('\"', "`", args.xy[j])
+      
+      #finds args that aren't functions by which have spaces
+      i.space <- which(!is.na(rowSums(str_locate(args.xy, " ")))) #which have spaces
+      i.space <- i.space[!is.element(i.space, i.fun)] #removes args with spaces that are within functions - already fixed above
+      args.xy[i.space] <- paste0("`", args.xy[i.space], "`") #back ticks around arg
+      
+      args.XY[i.noback] <- args.xy
+      args[i] <- args.XY
+      
+      
+    }
+    
+    
+    
     
     
     #applies any input argument functions to column
@@ -622,7 +628,7 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
       color <- NULL
     }
   
-  if (is.numeric(d$X)){
+  if (!is.character(d$X) & !is.factor(d$X)){
     X.Cat <- FALSE
   } else {
     X.Cat <- TRUE
@@ -897,7 +903,24 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     if (is.element("x", log)) {
       p <- p + scale_x_log10(labels = num.format.x, limits = xlim)
     } else {
-      p <- p + scale_x_continuous(labels = num.format.x, limits = xlim)
+      
+      if (is.numeric(d$X)){
+        p <- p + scale_x_continuous(labels = num.format.x, limits = xlim)
+      } else {
+        
+        if (is.POSIXt(d$X)){
+          
+          #if xlim is supplied as character, convert to posix
+          if (!is.null(xlim) & is.character(xlim)) xlim <- as.POSIXct(xlim)
+            
+          # message("POSIXt")
+          p <- p + scale_x_datetime(limits = xlim)
+          
+        } 
+        if (is.Date(d$X)) p <- p + scale_x_date(limits = xlim)
+
+      }
+      
     }
   }
   
@@ -965,7 +988,7 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "both",
 
 
 
-message("-- weplot loaded (version 1.2) --")
+message('-- weplot loaded (version 1.21) --')
 
 
 

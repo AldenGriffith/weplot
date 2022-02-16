@@ -1,5 +1,6 @@
+library(tidyverse)
 
-
+load("~/Wellesley Courses/ES 220/ES 220 S22/Labs/04/Code/Lab 4 Data - Jan 6 2021.RData")
 
 setwd("~/GitHub/weplot")
 Glacier <- read_csv("Glacier Data Stacked.csv")
@@ -12,6 +13,29 @@ weplot(data = Glacier, x = "Site", y = "Size2",
 
 weplot(data = Glacier, x = "Site", y = Size2,
        group = "Location", type = "bar", error = "se")
+
+
+weplot(x = Hub$Date, y = list(Hub$`Precip pH`, Hub$`Stream pH`))
+
+
+weplot(x = Hour, y = list(Elec.Observed.W, Solar.Radiation.Wm2),
+       type = "point")
+
+
+weplot(x = Date, y = Solar.Radiation.Wm2, type = "point")
+
+
+weplot(x = Date, y = Solar.Radiation.Wm2, xlim = as.POSIXct(c("2012-01-01 00:00 UTC", "2012-01-02 00:00 UTC")))
+
+d <- weplot(x = Date[1:26], y = Solar.Radiation.Wm2[1:26], give.data =TRUE)
+
+weplot(x = Date, y = Solar.Radiation.Wm2, xlim = as.POSIXct(c("2012-01-01", "2012-04-01")))
+
+ggplot(d, aes(x = X, y = Y)) +
+  geom_point()
+
+args <- c("Hour", "list(Elec.Observed.W, Solar.Radiation.Wm2)")
+arg.names <- c("x", "y")
 
 
 

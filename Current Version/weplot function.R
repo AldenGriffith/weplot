@@ -1,12 +1,10 @@
 
 weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = "color",
-                   ylab = NULL, xlab = NULL, group.lab = NULL, type = "point",
+                   ylab = NULL, xlab = NULL, group.lab = NULL, type = "point", size = 1,
                    color = NULL, edge.color = "black", transparency = 0, xlim = NULL, ylim = NULL,
-                   bins = NULL, log = "", title = NULL, give.data = FALSE,
+                   bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  overlay <<- list
-  aoverlay <<- overlay
   
   # # # Yes, the code below is UGLY, but it works...  # # #
   
@@ -16,14 +14,21 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   suppressPackageStartupMessages(library(tidyverse))
   suppressPackageStartupMessages(library(lubridate))
   suppressPackageStartupMessages(library(scales))
+  suppressPackageStartupMessages(library(stringr))
   
   #gets input arguments
   args = as.list(match.call()[-1])
   
-  arg.names <- names(args)
+  arg.names <- names(args)  #e.g. "x" "y" "data"
   
   #keeps the arguments separate
-  args <- as.character(args)
+  args <- as.character(args)  #actual input values
+  
+  # print(args)
+  # print(arg.names)
+  
+  
+  
   
   if (is.element("x", commas)){
     num.format.x <- comma
@@ -40,44 +45,72 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   }
   
   
-  # print(args)
-  # print(arg.names)
+
   
   y.mat <- FALSE
   
   
+  
   if (!is.null(data)){
+    #Data frame provided----
     
-    # d <- as_tibble(data)
-    # 
-    # #SIMPLY RENAME COLUMNS!
-    # #Creates character objects
-    # X <- gsub("\"", "", deparse(substitute(x)))
-    # Y <- gsub("\"", "", deparse(substitute(y)))
-    # Group <- gsub("\"", "", deparse(substitute(group)))
-    # 
-    # print(Group)
-    # 
-    # names(d)[names(d) == X] <- "X"
-    # names(d)[names(d) == Y] <- "Y"
-    # 
-    # if (Group != "FALSE"){
-    #   group <- TRUE
-    #   names(d)[names(d) == Group] <- "Group"
-    #   
-    #   if(is.null(group.lab)) group.lab <- Group
-    #   print(group.lab)
-    #   
-    # } else {
-    #   group <- FALSE
-    # }
-    # 
+    
+    
+    
+    ### need to make sure there are backticks in x and y vars that have spaces
+    i <- which(is.element(arg.names, c("x", "y"))) #might not always be 1st and 2nd (not always both!)
+    
+    args.XY <- args[i]
+    
+    #some operators automatically have spaces around them (will cause problems below!) also, users might put in spaces
+    for (ii in 1:length(args.XY)){
+      
+      args.XY[ii] <- gsub(" \\+ ", "\\+", args.XY[ii])
+      args.XY[ii] <- gsub(" \\- ", "\\-", args.XY[ii])
+      args.XY[ii] <- gsub(" \\* ", "\\*", args.XY[ii])
+      args.XY[ii] <- gsub(" \\/ ", "\\/", args.XY[ii])
+      args.XY[ii] <- gsub(" \\^ ", "\\^", args.XY[ii])
+      
+    }
+    
+    
+    #assume any args that have back ticks are specified properly
+    i.noback <- which(is.na(rowSums(str_locate(args.XY, "`"))))
+    args.xy <- args.XY[i.noback]
+    
+    
+    
+    #if no backticks are included in x or y
+    if (length(args.xy) > 0){
+      
+      #find args with functions
+      #if there's quotes within, replace with back ticks (fixes spaces)
+      i.fun <- which(!is.na(rowSums(str_locate(args.xy, '\"'))))
+      
+      for (j in i.fun) args.xy[j] <- gsub('\"', "`", args.xy[j])
+      
+      #finds args that aren't functions by which have spaces
+      i.space <- which(!is.na(rowSums(str_locate(args.xy, " ")))) #which have spaces
+      i.space <- i.space[!is.element(i.space, i.fun)] #removes args with spaces that are within functions - already fixed above
+      args.xy[i.space] <- paste0("`", args.xy[i.space], "`") #back ticks around arg
+      
+      args.XY[i.noback] <- args.xy
+      args[i] <- args.XY
+      
+      
+    }
+    
+    
+    
+    
     
     #applies any input argument functions to column
     get.data <- function(data, arg.char){
       
       vars <- names(data)
-      
+      # print(vars)
+
+      #what does this do???
       for (i in 1:length(vars)){
         assign(vars[i], data[[i]])
       }
@@ -216,7 +249,7 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     
     
   } else {
-    
+    #Data frame not provided----
     
     #Deals with lists and names
     list.names <- function(arg.obj, arg.char){
@@ -534,13 +567,61 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   # print(Group)
   
   
+  
+  
+  # print(xlab)
+  # print(ylab)
+  
+  #remove backticks from axis labels if given data frame
+  #also add spaces around operators
+  if(!is.null(data)){
+    
+    xlab <- gsub("`", "", xlab)
+    ylab <- gsub("`", "", ylab)
+    
+    xlab <- gsub("\\+", " \\+ ", xlab)
+    xlab <- gsub("\\-", " \\- ", xlab)
+    xlab <- gsub("\\*", " \\* ", xlab)
+    xlab <- gsub("\\-", " \\- ", xlab)
+ 
+    ylab <- gsub("\\+", " \\+ ", ylab)
+    ylab <- gsub("\\-", " \\- ", ylab)
+    ylab <- gsub("\\*", " \\* ", ylab)
+    ylab <- gsub("\\-", " \\- ", ylab)
+    
+  }
+  
+  
+  # Make figure ----
+  
+  
   if (group & !is.null(color) & !y.mat & group.type != "panels")
     if (length(color) != length(levels(d$Group))){
-      warning("Number of colors provided does not match number of groups \n  Using default colors")
+      warning("Number of colors provided does not match number of groups \n  Using default colors", call. = FALSE)
       color <- NULL
     }
   
+  if (!is.character(d$X) & !is.factor(d$X)){
+    X.Cat <- FALSE
+  } else {
+    X.Cat <- TRUE
+    
+    #type not specified
+    if (missing(type)) type <- "boxplot"
+    
+    #type specified
+    if (!is.element(type, c("boxplot", "bar", "point"))){
+      warning("Defaulting to boxplot for categorical X variable", call. = FALSE)
+      type <- "boxplot"
+    }
+    
+    # message("X is categorical")
+    # print(type)
+  }
+  
   if (type == "hist"){
+    
+    size <- 0.5*size
     
     # message("Plot Histogram")
     
@@ -558,15 +639,15 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     if (!group | group.type == "panels") {
       
       if (is.null(color)) {
-        p <- p + geom_histogram(alpha = 1 - transparency, bins = bins, fill = blue, color = edge.color)
+        p <- p + geom_histogram(alpha = 1 - transparency, bins = bins, fill = blue, color = edge.color, size = size)
       } else {
-        p <- p + geom_histogram(fill = color, alpha = 1 - transparency, bins = bins, color = edge.color)
+        p <- p + geom_histogram(fill = color, alpha = 1 - transparency, bins = bins, color = edge.color, size = size)
       }
       
     } else if (group.type == "color") {
       
       # print(group.lab)
-      p <- p + geom_histogram(aes(fill = Group), alpha = 1 - transparency, bins = bins, color = edge.color) +
+      p <- p + geom_histogram(aes(fill = Group), alpha = 1 - transparency, bins = bins, color = edge.color, size = size) +
         labs(fill = group.lab)
       
       if (!is.null(color)) p <- p + scale_fill_manual(values = color)
@@ -587,10 +668,19 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
            line = {geom <- geom_line},
            both = {geom <- geom_line},
            path = {geom <- geom_path},
-           area = {geom <- geom_area})
+           area = {geom <- geom_area},
+           boxplot = {geom <- geom_boxplot})
     
     
-    if (missing(edge.color)) edge.color <- NA
+    if (type == "point"){
+      size <- size*1.5
+    } else {
+      size <- size*0.5
+    }
+    
+    # if (missing(edge.color)) edge.color <- NA
+    
+    # print(edge.color)
     
     p <- ggplot(data = d, aes(x = X, y = Y))
     
@@ -606,12 +696,12 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
         
         if (is.null(color)) {
           
-          p <- p + geom(alpha = 1 - transparency, color = blue)
-          if (type == "both") p <- p + geom_point(alpha = 1 - transparency, color = blue)
+          p <- p + geom(alpha = 1 - transparency, color = blue, size = size)
+          if (type == "both") p <- p + geom_point(alpha = 1 - transparency, color = blue, size = size*3)
           
         } else {
-          p <- p + geom(color = color, alpha = 1 - transparency)
-          if (type == "both") p <- p + geom_point(color = color, alpha = 1 - transparency)
+          p <- p + geom(color = color, alpha = 1 - transparency, size = size)
+          if (type == "both") p <- p + geom_point(color = color, alpha = 1 - transparency, size = size*3)
         }
         
       } else if (y.mat) {
@@ -619,15 +709,15 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
         # print(y.mat)
         if (is.null(color)) {
           
-          p <- p + geom(aes(group = Group), alpha = 1 - transparency, color = blue) +
+          p <- p + geom(aes(group = Group), alpha = 1 - transparency, color = blue, size = size) +
             theme(legend.position = "none")
-          if (type == "both") p <- p + geom_point(aes(group = Group), alpha = 1 - transparency, color = blue)
+          if (type == "both") p <- p + geom_point(aes(group = Group), alpha = 1 - transparency, color = blue, size = size*3)
           
         } else {
           
-          p <- p + geom(aes(group = Group), alpha = 1 - transparency, color = color) +
+          p <- p + geom(aes(group = Group), alpha = 1 - transparency, color = color, size = size) +
             theme(legend.position = "none")
-          if (type == "both") p <- p + geom_point(aes(group = Group), alpha = 1 - transparency, color = color)
+          if (type == "both") p <- p + geom_point(aes(group = Group), alpha = 1 - transparency, color = color, size = size*3)
           
           
         }
@@ -637,9 +727,9 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
       } else if (group.type == "color") {
         
         # print(group.lab)
-        p <- p + geom(aes(color = Group), alpha = 1 - transparency) +
+        p <- p + geom(aes(color = Group), alpha = 1 - transparency, size = size) +
           labs(color = group.lab)
-        if (type == "both") p <- p + geom_point(aes(color = Group), alpha = 1 - transparency)
+        if (type == "both") p <- p + geom_point(aes(color = Group), alpha = 1 - transparency, size = size*3)
         
         if (!is.null(color)) p <- p + scale_color_manual(values = color)
         # add.color.scale <- TRUE
@@ -648,20 +738,26 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     } 
     
     
-    #FILL----
-    if (is.element(type, "area")) {
+    #Area and Boxplot----
+    if (is.element(type, c("area", "boxplot"))) {
+      
+      if (missing(edge.color) & type == "area") edge.color <- NA
       
       if (!group | group.type == "panels") {
         
-        if (is.null(color)) {
-          p <- p + geom(alpha = 1 - transparency, fill = blue, color = edge.color)
-        } else {
-          p <- p + geom(fill = color, alpha = 1 - transparency)
-        }
+        if (is.null(color)) color <- blue
+        p <- suppressWarnings(p + geom(alpha = 1 - transparency, fill = color, color = edge.color, size = size, outlier.size = size*3))
+        
+        
+        # if (is.null(color)) {
+        #   p <- p + geom(alpha = 1 - transparency, fill = blue, color = edge.color, size = size)
+        # } else {
+        #   p <- p + geom(fill = color, alpha = 1 - transparency, size = size)
+        # }
         
       } else if (group.type == "color") {
         
-        p <- p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color)
+        p <- suppressWarnings(p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color, size = size, outlier.size = size*3))
         
         if (!is.null(color)) p <- p + scale_fill_manual(values = color)
         # add.color.scale <- TRUE
@@ -670,7 +766,87 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     } 
     
     
-  }
+    #Bar ----
+    if (is.element(type, c("bar"))) {
+      
+      geom <- geom_bar
+      
+      if (error == "sd"){
+        error_fun <- function (x) {
+          x <- stats::na.omit(x)
+          SD <- stats::sd(x)
+          MEAN <- mean(x)
+          data.frame(y = MEAN, ymin = MEAN - SD, ymax = MEAN + SD)
+        }
+      }
+      
+      if (error == "se") error_fun <- mean_se
+      
+      if (missing(error)) message("Error bars show 1 SD by default")
+      
+      # if (missing(edge.color) & type == "area") edge.color <- NA
+      
+      if (!group | group.type == "panels") {
+        
+        if (is.null(color)) color <- blue
+        p <- p + geom(alpha = 1 - transparency, fill = color, color = edge.color, size = size,
+                      stat = "summary", fun = mean)
+        
+        if (is.element(error, c("sd", "se"))){
+          p <- p + stat_summary(geom = "errorbar", position = "dodge", fun.data = error_fun,
+                                size = size, color = edge.color, width = error.width)
+        } else {warning("Unknown error bar type specified", call. = FALSE)}
+        
+        
+      } else if (group.type == "color") {
+        
+        p <- p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color, size = size,
+                      stat = "summary", fun = mean, position = position_dodge())
+        
+        if (is.element(error, c("sd", "se"))){
+          #note that 0.9 is the default width for errorbars
+          p <- p + stat_summary(geom = "errorbar", aes(group = Group), position = position_dodge(0.9), fun.data = error_fun,
+                                size = size, color = edge.color, width = error.width)
+        } else {warning("Unknown error bar type specified", call. = FALSE)}
+        
+        if (!is.null(color)) p <- p + scale_fill_manual(values = color)
+        # add.color.scale <- TRUE
+      }
+      
+    } 
+    
+    
+  } # end of non-histogram plots
+  
+  
+  
+  
+  
+  # gg_cat <- geom_bar(width = Spacing.X, stat = "summary", fun.y = mean, color = input$Edge.Color, fill = input$Fill.Color, size = input$Cat.Edge)
+  # gg_error <- stat_summary(geom = "errorbar", position = "dodge", fun.data = fun.error, width = input$Error.Cap/100, size = input$Cat.Edge)
+  
+  
+  
+  # if (is.element(type, c("boxplot"))) {
+  #   
+  #   if (!group | group.type == "panels") {
+  #     
+  #     if (is.null(color)) {
+  #       p <- p + geom(alpha = 1 - transparency, fill = blue, color = "black", size = size)
+  #     } else {
+  #       p <- p + geom(fill = color, alpha = 1 - transparency, color = edge.color, size = size)
+  #     }
+  #     
+  #   } else if (group.type == "color") {
+  #     
+  #     p <- p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color)
+  #     
+  #     if (!is.null(color)) p <- p + scale_fill_manual(values = color)
+  #     # add.color.scale <- TRUE
+  #   }
+  #   
+  # } 
+  
   
   
   if (group & group.type == "panels") {
@@ -696,10 +872,29 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   
   
   
-  if (is.element("x", log)) {
-    p <- p + scale_x_log10(labels = num.format.x, limits = xlim)
-  } else {
-    p <- p + scale_x_continuous(labels = num.format.x, limits = xlim)
+  if (!X.Cat){
+    if (is.element("x", log)) {
+      p <- p + scale_x_log10(labels = num.format.x, limits = xlim)
+    } else {
+      
+      if (is.numeric(d$X)){
+        p <- p + scale_x_continuous(labels = num.format.x, limits = xlim)
+      } else {
+        
+        if (is.POSIXt(d$X)){
+          
+          #if xlim is supplied as character, convert to posix
+          if (!is.null(xlim) & is.character(xlim)) xlim <- as.POSIXct(xlim)
+            
+          # message("POSIXt")
+          p <- p + scale_x_datetime(limits = xlim)
+          
+        } 
+        if (is.Date(d$X)) p <- p + scale_x_date(limits = xlim)
+
+      }
+      
+    }
   }
   
   if (is.element("y", log)) {
@@ -716,7 +911,7 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   if (give.data) {
     return(d)
   } else {
-    print(p)
+    suppressWarnings(print(p))
   }
   
 }
@@ -762,11 +957,11 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "both",
   # return(Y)
   rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
   
-} 
+}
 
 
 
-message("-- weplot loaded (version 1.1) --")
+message('-- weplot loaded (version 1.21) --')
 
 
 
