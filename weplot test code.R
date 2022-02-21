@@ -8,22 +8,59 @@ Hub <- read_csv("Hubbard Brook.csv")
 
 weplot(x = Glacier$Site, y = Glacier$Size2, type = "boxplot", give.data = FALSE)
 
+weplot(data = Glacier, x = "Size1", y = "Size2",
+       group = Size1, type = "point + path",
+       color = hcl.colors("viridis"),
+       group.lab = "Size June")
+
+
+weplot(data = Glacier, x = Site, y = "Size2",
+       group = Class.Binary, type = "bar",
+       # color = c("orange", "darkred"),
+       group.lab = "Size June", error = "none",
+       group.type = "panels")
+
+
+
+
 weplot(data = Glacier, x = "Site", y = "Size2",
-       group = "Location", type = "bar", error = "se")
+       group = "Class.Binary", type = "bar", error = "se",
+       group.type = "color", group.lab = "Howdy",
+       group.names = c("A","B"))
+
+weplot(x = Hour, y = list(Solar.Radiation.Wm2, Elec.Observed.W))
+weplot(x = Hour, y = list(Elec.Observed.W, Solar.Radiation.Wm2))
+
+
+
+weplot(x = list(Elec.Observed.W, Solar.Radiation.Wm2),
+       group.names = c("Observed", "Solar"),
+       group.lab = "Type",
+       color = c("red", "blue"))
+
+
+ggplot(Glacier, aes(x = Site, y = Size2, color = Class.Binary)) +
+  geom_boxplot() +
+  labs(color = "Hello", breaks = c("a", "B"))
+  # scale_color_discrete(labels = NULL)
+  
+  
+
 
 weplot(data = Glacier, x = "Site", y = Size2,
-       group = "Location", type = "bar", error = "se")
+       group = "Location", type = "box", edge.color = c("green", "blue"))
+
+weplot(Size2, data = Glacier, color = "#79C470", size = 2)
 
 
-weplot(x = Elec.Observed.W, type = "point")
-
-weplot(x = Hub$Date, y = list(Hub$`Precip pH`, Hub$`Stream pH`))
+weplot(x = Hub$Date, y = list(Hub$`Precip pH`, Hub$`Stream pH`),
+       group.lab = c("Precip pH", "Stream pH"))
 
 
 weplot(x = Elec.Observed.W, type = "hist")
 
 weplot(x = Hour, y = list(Elec.Observed.W, Solar.Radiation.Wm2),
-       type = "point")
+       type = "point", size = c(0.5, 3))
 
 
 weplot(x = Date, y = Solar.Radiation.Wm2, type = "point")

@@ -6,33 +6,6 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
                    commas = ""){
   
   
-  # setwd("~/Wellesley Courses/ES 220/ES 220 S22/Labs/WePlot")
-  # Glacier <- read_csv("Glacier Data Stacked.csv")
-  # 
-  #   x = Glacier$Size1
-  #   y = Glacier$Size2
-  #   data = NULL
-  #   group = FALSE
-  #   group.type = "color"
-  #   ylab = NULL
-  #   xlab = NULL
-  #   group.lab = NULL
-  #   type = "point"
-  #   color = NULL
-  #   edge.color = "black"
-  #   transparency = 0
-  #   xlim = NULL
-  #   ylim = NULL
-  #   bins = NULL
-  #   log = ""
-  #   title = NULL
-  #   give.data = FALSE
-  #   commas = ""
-  
-  
-  # overlay <<- list
-  # aoverlay <<- overlay
-  
   # # # Yes, the code below is UGLY, but it works...  # # #
   
   
@@ -644,12 +617,12 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     X.Cat <- TRUE
     
     #type not specified
-    if (missing(type)) type <- "box"
+    if (missing(type)) type <- "boxplot"
     
     #type specified
-    if (!is.element(type, c("box", "bar", "point"))){
+    if (!is.element(type, c("boxplot", "bar", "point"))){
       warning("Defaulting to boxplot for categorical X variable", call. = FALSE)
-      type <- "box"
+      type <- "boxplot"
     }
     
     # message("X is categorical")
@@ -706,7 +679,7 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
            both = {geom <- geom_line},
            path = {geom <- geom_path},
            area = {geom <- geom_area},
-           box = {geom <- geom_boxplot})
+           boxplot = {geom <- geom_boxplot})
     
     
     if (type == "point"){
@@ -776,7 +749,7 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     
     
     #Area and Boxplot----
-    if (is.element(type, c("area", "box"))) {
+    if (is.element(type, c("area", "boxplot"))) {
       
       if (missing(edge.color) & type == "area") edge.color <- NA
       

@@ -944,6 +944,15 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
   
   # print(p)
   
+  # if (!is.null(group.lab)){
+  #   
+  #   p <- p + labs(color = group.lab)
+  #   
+  #   
+  # }
+  
+  # message(group.lab)
+  
   
   if (give.data) {
     return(d)
@@ -951,7 +960,13 @@ weplot <- function(x = NULL, y = NULL, data = NULL, group = FALSE, group.type = 
     suppressWarnings(print(p))
   }
   
-}
+  
+  
+  
+} # end of weplot
+
+
+
 
 
 weplot.Pop <- function(x = NULL, y = NULL, type = "both",
@@ -998,7 +1013,7 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "both",
 
 
 
-message('-- weplot loaded (version 1.22) --')
+message('-- weplot loaded (version 1.23) --')
 
 
 
