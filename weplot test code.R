@@ -6,7 +6,25 @@ setwd("~/GitHub/weplot")
 Glacier <- read_csv("Glacier Data Stacked.csv")
 Hub <- read_csv("Hubbard Brook.csv")
 
-weplot(x = Glacier$Site, y = Glacier$Size2, type = "boxplot", give.data = FALSE)
+
+weplot(x = Site, y = Size2, group = Location, data = Glacier,
+       type = "box", group.type = "panels", give.data = FALSE,
+       color = c("red","purple"))
+
+
+weplot(x = Date, y = list(Precip, Melt), type = "area", group.type = "color",
+       group.names = c("a", "b"))
+
+
+weplot(x = Size2, group = Site, data = Glacier, group.type = "panels", edge.color = NA,
+       group.names = c("2", "4"))
+
+
+ggplot(data = Glacier, aes(x = Size2, fill = Location)) +
+  geom_histogram() +
+  facet_wrap(~Location)
+
+
 
 weplot(data = Glacier, x = "Size1", y = "Size2",
        group = Size1, type = "point + path",
@@ -19,6 +37,11 @@ weplot(data = Glacier, x = Site, y = "Size2",
        # color = c("orange", "darkred"),
        group.lab = "Size June", error = "none",
        group.type = "panels")
+
+
+download.file(url = "https://raw.githubusercontent.com/AldenGriffith/weplot/main/current-version/weplot.R",
+              destfile = "weplot.R")
+source("weplot.R")
 
 
 

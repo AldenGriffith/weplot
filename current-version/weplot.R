@@ -6,33 +6,15 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  
-  # setwd("~/Wellesley Courses/ES 220/ES 220 S22/Labs/WePlot")
-  # Glacier <- read_csv("Glacier Data Stacked.csv")
-  # 
-  #   x = Glacier$Size1
-  #   y = Glacier$Size2
-  #   data = NULL
-  #   group = FALSE
-  #   group.type = "color"
-  #   ylab = NULL
-  #   xlab = NULL
-  #   group.lab = NULL
-  #   type = "point"
-  #   color = NULL
-  #   edge.color = "black"
-  #   transparency = 0
-  #   xlim = NULL
-  #   ylim = NULL
-  #   bins = NULL
-  #   log = ""
-  #   title = NULL
-  #   give.data = FALSE
-  #   commas = ""
+  # v1.26 # # # # #
+  #  
+  # - Fixed an issue of making 2 plots when adding a geom to weplot
+  # - group.names now applies to panels
+  # - group colors can now apply to panels (though default is blue for all panels)
+  #
+  # # # # # # # # #
   
   
-  # overlay <<- list
-  # aoverlay <<- overlay
   
   # # # Yes, the code below is UGLY, but it works...  # # #
   
@@ -633,15 +615,41 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     
     if (!is.numeric(d$Group)) d$Group <- factor(d$Group)
     
+    if (!is.null(group.names)){
+      
+      group.levels <- levels(d$Group)
+      
+      d$Group <- as.character(d$Group)
+      
+      for (i in 1:length(group.levels)){
+        d$Group[d$Group == group.levels[i]] <- group.names[i]
+      }
+      
+      d$Group <- factor(d$Group, levels = group.names)
+    }
+
   }
   
   
   # Make figure ----
   
+  if (group & is.null(color) & !y.mat & group.type == "panels"){
+    
+    color <- rep(blue, length(levels(d$Group)))
+    
+  }
   
-  if (group & !is.null(color) & !y.mat & group.type != "panels"){
+ 
+  # if (group & !is.null(color) & !y.mat & group.type != "panels"){
+    if (group & !is.null(color) & !y.mat){
     
     if (!is.numeric(d$Group)){
+      
+      if (group.type == "panels" & length(color) == 1){
+        color <- rep(color, length(levels(d$Group)))
+      }
+      
+      
       if (length(color) != length(levels(d$Group))){
         
         # print(levels(d$Group))
@@ -689,16 +697,18 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     #   p <- p + geom_histogram(fill = color, alpha = 1 - transparency, bins = bins)
     # }
     
-    
-    if (!group | group.type == "panels") {
+    #temp change here!
+    # if (!group | group.type == "panels") {
+    if (!group) {
       
       if (is.null(color)) {
         p <- p + geom_histogram(alpha = 1 - transparency, bins = bins, fill = blue, color = edge.color, size = size)
       } else {
         p <- p + geom_histogram(fill = color, alpha = 1 - transparency, bins = bins, color = edge.color, size = size)
       }
-      
-    } else if (group.type == "color") {
+    
+    # } else if (group.type == "color") {  
+    } else {
       
       # print(group.lab)
       p <- p + geom_histogram(aes(fill = Group), alpha = 1 - transparency, bins = bins, color = edge.color, size = size) +
@@ -762,7 +772,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
       # print(group.type)
       # print(names(d))
       
-      if (!group | group.type == "panels") {
+      if (!group) {
         #No group OR facet grouping
         
         if (is.null(color)) {
@@ -795,7 +805,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
         }
         
-      } else if (group.type == "color") {
+      } else {
         
     
         # GROUPING by color
@@ -841,7 +851,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
       
       if (missing(edge.color) & type == "area") edge.color <- NA
       
-      if (!group | group.type == "panels") {
+      if (!group) {
         
         if (is.null(color)) color <- blue
         p <- suppressWarnings(p + geom(alpha = 1 - transparency, fill = color, color = edge.color, size = size, outlier.size = size*3))
@@ -853,7 +863,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
         #   p <- p + geom(fill = color, alpha = 1 - transparency, size = size)
         # }
         
-      } else if (group.type == "color") {
+      } else {
         
         p <- suppressWarnings(p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color, size = size, outlier.size = size*3)) +
           labs(fill = group.lab)
@@ -913,7 +923,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
       
       # if (missing(edge.color) & type == "area") edge.color <- NA
       
-      if (!group | group.type == "panels") {
+      if (!group) {
         
         if (is.null(color)) color <- blue
         p <- p + geom(alpha = 1 - transparency, fill = color, color = edge.color, size = size,
@@ -929,7 +939,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           }
         
         
-      } else if (group.type == "color") {
+      } else {
         
         p <- p + geom(aes(fill = Group), alpha = 1 - transparency, color = edge.color, size = size,
                       stat = "summary", fun = mean, position = position_dodge()) +
@@ -1014,7 +1024,9 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   
   if (group & group.type == "panels") {
     
-    p <- p + facet_wrap(vars(Group))
+    p <- p + facet_wrap(vars(Group)) +
+      theme(legend.position = "none")
+    
     
   }
   
@@ -1083,7 +1095,8 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   if (give.data) {
     return(d)
   } else {
-    suppressWarnings(print(p))
+    # suppressWarnings(print(p))
+    suppressWarnings(p)
   }
   
   
@@ -1139,7 +1152,7 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "both",
 
 
 
-message('-- weplot loaded (version 1.24) --')
+message("-- weplot loaded (version 1.26) --")
 
 
 
