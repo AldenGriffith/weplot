@@ -21,7 +21,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   
   
   # Installs packages required by weplot if not already installed
-  packages <- c("tidyverse", "lubridate", "scales", "stringr", "poopy")
+  packages <- c("tidyverse", "lubridate", "scales", "stringr")
   installed <- installed.packages()[,"Package"]
   i <- which(!is.element(packages, installed))
   if(length(i) > 0){
