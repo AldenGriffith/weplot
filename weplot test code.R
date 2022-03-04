@@ -7,6 +7,10 @@ Glacier <- read_csv("Glacier Data Stacked.csv")
 Hub <- read_csv("Hubbard Brook.csv")
 
 
+
+
+
+
 weplot(x = Site, y = Size2, group = Location, data = Glacier,
        type = "box", group.type = "panels", give.data = FALSE,
        color = c("red","purple"))

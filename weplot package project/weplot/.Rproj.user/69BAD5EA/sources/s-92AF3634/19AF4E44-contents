@@ -1,0 +1,10 @@
+Package: weplot
+Type: Package
+Title: Make easy plots!
+Version: 0.1.0
+Author: Alden Griffith
+Maintainer: Alden Griffith <agriffit@wellesely.edu>
+Description: Good stuf!
+License: None
+Encoding: UTF-8
+LazyData: true
