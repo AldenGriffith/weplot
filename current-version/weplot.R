@@ -11,6 +11,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   # - Fixed an issue of making 2 plots when adding a geom to weplot
   # - group.names now applies to panels
   # - group colors can now apply to panels (though default is blue for all panels)
+  # - asks to install missing packages
   #
   # # # # # # # # #
   
@@ -19,12 +20,28 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   # # # Yes, the code below is UGLY, but it works...  # # #
   
   
-  blue <- rgb(14, 40, 121, maxColorValue = 255)
+  # Installs packages required by weplot if not already installed
+  packages <- c("tidyverse", "lubridate", "scales", "stringr", "poopy")
+  installed <- installed.packages()[,"Package"]
+  i <- which(!is.element(packages, installed))
+  if(length(i) > 0){
+    
+    message("weplot needs to install the following packages:")
+    print(packages[i])
+    yesno <- readline(prompt="Ok to install? (y/n) ")
+    
+    if (is.element(yesno, c("Y", "y", "yes", "Yes", "YES"))){
+      install.packages(packages[i])
+    }
+  }
   
   suppressPackageStartupMessages(library(tidyverse))
   suppressPackageStartupMessages(library(lubridate))
   suppressPackageStartupMessages(library(scales))
   suppressPackageStartupMessages(library(stringr))
+  
+  
+  blue <- rgb(14, 40, 121, maxColorValue = 255)
   
   #gets input arguments
   args = as.list(match.call()[-1])
@@ -627,7 +644,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
       
       d$Group <- factor(d$Group, levels = group.names)
     }
-
+    
   }
   
   
@@ -639,9 +656,9 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     
   }
   
- 
+  
   # if (group & !is.null(color) & !y.mat & group.type != "panels"){
-    if (group & !is.null(color) & !y.mat){
+  if (group & !is.null(color) & !y.mat){
     
     if (!is.numeric(d$Group)){
       
@@ -706,8 +723,8 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
       } else {
         p <- p + geom_histogram(fill = color, alpha = 1 - transparency, bins = bins, color = edge.color, size = size)
       }
-    
-    # } else if (group.type == "color") {  
+      
+      # } else if (group.type == "color") {  
     } else {
       
       # print(group.lab)
@@ -807,7 +824,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
         
       } else {
         
-    
+        
         # GROUPING by color
         
         # print(group.lab)
@@ -896,7 +913,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           
         }
-          
+        
         # add.color.scale <- TRUE
       }
       
@@ -936,7 +953,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           if (error != "none")  warning("Unknown error bar type specified", call. = FALSE)
           
-          }
+        }
         
         
       } else {
@@ -953,7 +970,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           if (error != "none")  warning("Unknown error bar type specified", call. = FALSE)
           
-          }
+        }
         
         if (!is.null(color)){
           
