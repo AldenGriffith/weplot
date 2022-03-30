@@ -6,13 +6,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  # v1.27 # # # # #
-  #  
-  # - Fixed an issue with weplot.Pop
-  #
-  # # # # # # # # #
-  
-  
   # v1.26 # # # # #
   #  
   # - Fixed an issue of making 2 plots when adding a geom to weplot
@@ -1132,7 +1125,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
 
 
 
-weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
+weplot.Pop <- function(x = NULL, y = NULL, type = "both",
                        xlab = "Time", ylab = NULL, ...){
   
   #gets input arguments
@@ -1164,21 +1157,19 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
   # message(str(Y,1))
   # message(str(X,1))
   # new.weplot <- weplot
-  
   weplot.Pop.Y <<- Y
   weplot.Pop.X  <<- X
   
-  print(weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...))
+  weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...)
   
+  # return(Y)
   rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
-  
-  
   
 }
 
 
 
-message("-- weplot loaded (version 1.27) --")
+message("-- weplot loaded (version 1.26) --")
 
 
 
