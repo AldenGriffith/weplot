@@ -83,3 +83,40 @@ N.start <- function(A, Total.N){
 
 
 get.lam <- function(A) as.numeric(eigen(A)$values[1])
+
+
+mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A),
+                       post.breed = TRUE){
+  
+  # repro.rows <- 1:2  #default = 1
+  # repro.cols <- 2:ncol(A)
+  # Nt <- rep(100, nrow(A))
+  
+  
+  N.out <- Nt*0
+  
+  #need to specify post-pre census
+  
+  A.surv <- A
+  A.surv[repro.rows, repro.cols] <- 0
+  
+  A.repro <- A*0
+  A.repro[repro.rows, repro.cols] <- A[repro.rows, repro.cols]
+  
+  
+  for (j in 1:ncol(A)){
+    
+    for (i in 1:nrow(A)){
+      
+      #survival contributions
+      N.out[i] <- N.out[i] + sum(rbinom(Nt[j], 1, A.surv[i,j]))   #this currently allows the same individual to go to multiple classes
+      
+      #reproduction contributions
+      N.out[i] <- N.out[i] + sum(rpois(Nt[j], A.repro[i,j]))
+      
+    }
+  }
+  
+  return(N.out)  
+  
+}
