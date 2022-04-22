@@ -6,14 +6,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  # v1.29 # # # # #
-  #  
-  # - Added add.weplot function for adding points and lines
-  #
-  # # # # # # # # #
-  
-  
-  
   # v1.27 # # # # #
   #  
   # - Fixed an issue with weplot.Pop
@@ -468,6 +460,8 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
             
             if (is.null(group.lab)) group.lab <- args[arg.names == "group"]
             
+            # message("Hi!")
+            
             group <- TRUE
           }
         }
@@ -476,11 +470,15 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
         
       } else {
         
+        #y provided
+        
         lens <- c(sapply(x, length), sapply(y, length))
         # print(lens)
         
-        if (!any(mean(lens) == range(lens))) stop("x and y variables must have the same length")
+        #used to be error message here
+        # if (!any(mean(lens) == range(lens))) stop("x and y variables must have the same length")
         
+        # print(length(y))
         
         if (length(y) == 1){
           # message("single x, single y")
@@ -514,25 +512,41 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           # print(attr(y,'matrix'))
           
+          #find out if any of the y objects are matrices
+          print(y)
+          
+          
+          
+          
           d <- bind_cols(x, y)
           # names(d)[1] <- "X"  #keep y names for gather
           names(d) <- c("X", names(y))
           
           
-          # print(names(y))
+          print(names(y))
+          print(names(d))
+          
           # print(names(d))
           
           d <- gather(d, key = Group, value = Y, all_of(names(y)))
+          
+          
+          # print(names(d))
           
           #put in order given
           d$Group <- factor(d$Group, levels = names(y))
           
           group <- TRUE
           
+          # can disable to plot matrix as separate groups
           if(!is.null(attr(y,'matrix'))){
+            
             y.mat <- TRUE
             ylab <- attr(y,'name')
+            
           }
+          
+          
           # if(!is.null(attr(y,'name')) & is.null(ylab))  ylab <- attr(y,'name')
           
           if (is.null(xlab)) xlab <- names(x)[1]
@@ -1185,6 +1199,8 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
 }
 
 
+
+
 add.weplot <- function(x, y, type = "point", color = "black", size = 1, ...){
   
   if (type == "point"){
@@ -1198,23 +1214,22 @@ add.weplot <- function(x, y, type = "point", color = "black", size = 1, ...){
          line = {geom <- geom_line},
          path = {geom <- geom_path},
          text = {geom <- geom_text}
-  )
+         )
   
   
   d <- tibble(x = x, y = y)
   
   
   
-  geom(aes(x = x, y = y),
-       color = color, size = size,
-       inherit.aes = FALSE,
-       data = d, ...)
+  geom_line(aes(x = x, y = y), color = color,
+            inherit.aes = FALSE,
+            data = d, ...)
   
   
 }
 
 
-message("-- weplot loaded (version 1.29) --")
+message("-- weplot loaded (version 1.28) --")
 
 
 

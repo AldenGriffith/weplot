@@ -7,7 +7,40 @@ Glacier <- read_csv("Glacier Data Stacked.csv")
 Hub <- read_csv("Hubbard Brook.csv")
 
 
+p <- ggplot(data = Glacier, aes(x = Size1, y = Size2)) +
+  geom_point()
 
+pp <- NULL
+
+pp <- pp + geom_point(data = Glacier, aes(x = Size1, y = Surv), inherit.aes = FALSE)
+
+pp <- geom_point(data = Glacier, aes(x = Size1, y = Surv), inherit.aes = FALSE)
+
+p + pp
+
+weplot(x = 0:Time, y = list(Med.N), type = "line")
+
+weplot(x = 0:Time, y = list(Med.N, Total.N), type = "line")
+
+weplot(x = 0:Time, y = Total.N, type = "line") +
+  add.weplot(0:Time, Med.N, color = "red", type = "line",
+             size = 2, linetype = "dashed")
+
+
+weplot(x = 0:Time, y = Total.N, type = "point") +
+  add.weplot(0:Time, Med.N, color = "red", type = "text",
+             size = 10, label = "hello")
+
+
+weplot(x = 0:Time, y = Total.N, type = "line") +
+  geom_point(aes(x = 0:Time, y = Med.N), color = "red",
+            inherit.aes = FALSE, data = NULL)
+
+
+
+
+
+weplot(x = Size1, y = Size2, data = Glacier)
 
 
 

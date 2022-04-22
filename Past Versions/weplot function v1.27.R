@@ -6,14 +6,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  # v1.29 # # # # #
-  #  
-  # - Added add.weplot function for adding points and lines
-  #
-  # # # # # # # # #
-  
-  
-  
   # v1.27 # # # # #
   #  
   # - Fixed an issue with weplot.Pop
@@ -1185,36 +1177,8 @@ weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
 }
 
 
-add.weplot <- function(x, y, type = "point", color = "black", size = 1, ...){
-  
-  if (type == "point"){
-    size <- size*1.5
-  } else {
-    size <- size*0.5
-  }
-  
-  switch(type,
-         point = {geom <- geom_point},
-         line = {geom <- geom_line},
-         path = {geom <- geom_path},
-         text = {geom <- geom_text}
-  )
-  
-  
-  d <- tibble(x = x, y = y)
-  
-  
-  
-  geom(aes(x = x, y = y),
-       color = color, size = size,
-       inherit.aes = FALSE,
-       data = d, ...)
-  
-  
-}
 
-
-message("-- weplot loaded (version 1.29) --")
+message("-- weplot loaded (version 1.27) --")
 
 
 
