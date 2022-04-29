@@ -73,11 +73,15 @@ median.N <- function(N, time = NULL){
 }
 
 
-N.start <- function(A, Total.N){
+N.start <- function(A, Total.N, round = FALSE){
   
   w <- as.numeric(eigen(A)$vectors[,1]/sum(eigen(A)$vectors[,1]))
   
-  return(round(w*Total.N))
+  w <- w*Total.N
+  
+  if (round) round(w)
+  
+  return(w)
   
 }
 
