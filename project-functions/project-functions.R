@@ -79,7 +79,7 @@ N.start <- function(A, Total.N, round = FALSE){
   
   w <- w*Total.N
   
-  if (round) round(w)
+  if (round) w <- round(w)
   
   return(w)
   
