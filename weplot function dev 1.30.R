@@ -1224,7 +1224,7 @@ add.weplot <- function(x, y, type = "point", color = "black", size = 1, ...){
 }
 
 
-message("-- weplot loaded (version 1.29) --")
+message("-- weplot loaded (version 1.30) --")
 
 
 
