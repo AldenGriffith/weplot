@@ -6,14 +6,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
-  # v1.30 # # # # #
-  #  
-  # - Disabled soft depreciation warnings 
-  #
-  # # # # # # # # #
-  
-  
-  
   # v1.29 # # # # #
   #  
   # - Added add.weplot function for adding points and lines
@@ -63,8 +55,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   suppressPackageStartupMessages(library(scales))
   suppressPackageStartupMessages(library(stringr))
   
-  #disable warning messages about soft depreciated args/functions (e.g. size vs linewidth)
-  rlang::local_options(lifecycle_verbosity = "quiet")
   
   blue <- rgb(14, 40, 121, maxColorValue = 255)
   
