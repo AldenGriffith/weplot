@@ -1,12 +1,3 @@
-# v1.31 # # # # #
-#  
-# - Added argument hist.type ("stack", "side", "overlay")
-# - Removed weplot.Pop (honestly not sure why it's needed anymore?)
-# - Fixed an issue with ylab when y object is a matrix
-#
-# # # # # # # # #
-
-
 
 # v1.30 # # # # #
 #  
@@ -47,8 +38,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    ylab = NULL, xlab = NULL, group.lab = NULL, group.names = NULL,
                    size = 1,
                    color = NULL, edge.color = "black", transparency = 0, xlim = NULL, ylim = NULL,
-                   bins = NULL, hist.type = "stack",
-                   log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
+                   bins = NULL, log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
   # # # Yes, the code below is UGLY, but it works...  # # #
@@ -526,11 +516,9 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           # print(d)
           
-        
           if (is.null(xlab)) xlab <- names(x)[1]
           if (is.null(ylab)) ylab <- names(y)[1]
           
-         
         } else {
           # message("single x, multiple y")
           
@@ -554,9 +542,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           if(!is.null(attr(y,'matrix'))){
             y.mat <- TRUE
-           
-            if (is.null(ylab)) ylab <- attr(y,'name')
-            
+            ylab <- attr(y,'name')
           }
           # if(!is.null(attr(y,'name')) & is.null(ylab))  ylab <- attr(y,'name')
           
@@ -742,12 +728,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     
     size <- 0.5*size
     
-    switch(hist.type,
-           stack = {hist.type <- "stack"},
-           side = {hist.type <- position_dodge()},
-           overlay = {hist.type <- "identity"}
-    )
-    
     # message("Plot Histogram")
     
     p <- ggplot(data = d, aes(x = X))
@@ -774,7 +754,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     } else {
       
       # print(group.lab)
-      p <- p + geom_histogram(aes(fill = Group), alpha = 1 - transparency, bins = bins, color = edge.color, size = size, position = hist.type) +
+      p <- p + geom_histogram(aes(fill = Group), alpha = 1 - transparency, bins = bins, color = edge.color, size = size) +
         labs(fill = group.lab)
       
       if (!is.null(color)){
@@ -1096,8 +1076,6 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   
   # return(d)
   
-  print(ylab)
-  
   if (is.null(group.lab)) p <- p + theme(legend.title = element_blank())
   # if (!is.null(group.lab)) p <- p + theme(legend.title = element_blank())
   if (!is.null(xlab)) p <- p + xlab(xlab)
@@ -1173,49 +1151,49 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
 
 
 
-# weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
-#                        xlab = "Time", ylab = NULL, ...){
-#   
-#   #gets input arguments
-#   args = as.list(match.call()[-1])
-#   arg.names <- names(args) 
-#   args <- as.character(args)
-#   
-#   
-#   #single argument x = N
-#   if (is.null(y)){
-#     X <- 1:ncol(x) - 1
-#     y <- x
-#     
-#     if(is.null(ylab)) ylab <- args[arg.names == "x"]
-#     # message("no y")
-#     
-#   } else {
-#     X <- x
-#     if(is.null(ylab)) ylab <- args[arg.names == "y"]
-#     
-#   }
-#   
-#   
-#   
-#   Y <- list()
-#   for (i in 1:nrow(y)) Y[[i]] <- y[i,]
-#   if (!is.null(rownames(y))) names(Y) <- rownames(y)
-#   
-#   # message(str(Y,1))
-#   # message(str(X,1))
-#   # new.weplot <- weplot
-#   
-#   weplot.Pop.Y <<- Y
-#   weplot.Pop.X  <<- X
-#   
-#   print(weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...))
-#   
-#   rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
-#   
-#   
-#   
-# }
+weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
+                       xlab = "Time", ylab = NULL, ...){
+  
+  #gets input arguments
+  args = as.list(match.call()[-1])
+  arg.names <- names(args) 
+  args <- as.character(args)
+  
+  
+  #single argument x = N
+  if (is.null(y)){
+    X <- 1:ncol(x) - 1
+    y <- x
+    
+    if(is.null(ylab)) ylab <- args[arg.names == "x"]
+    # message("no y")
+    
+  } else {
+    X <- x
+    if(is.null(ylab)) ylab <- args[arg.names == "y"]
+    
+  }
+  
+  
+  
+  Y <- list()
+  for (i in 1:nrow(y)) Y[[i]] <- y[i,]
+  if (!is.null(rownames(y))) names(Y) <- rownames(y)
+  
+  # message(str(Y,1))
+  # message(str(X,1))
+  # new.weplot <- weplot
+  
+  weplot.Pop.Y <<- Y
+  weplot.Pop.X  <<- X
+  
+  print(weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...))
+  
+  rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
+  
+  
+  
+}
 
 
 add.weplot <- function(x, y, type = "point", color = "black", size = 1, label = NULL, ...){
@@ -1237,16 +1215,16 @@ add.weplot <- function(x, y, type = "point", color = "black", size = 1, label = 
          text = {geom <- geom_text}
   )
   
-  
+
   d <- tibble(x = x, y = y, label = label)
   
   
   if (type != "text"){
     
     geom(aes(x = x, y = y),
-         color = color, size = size,
-         inherit.aes = FALSE,
-         data = d, ...)
+                color = color, size = size,
+                inherit.aes = FALSE,
+                data = d, ...)
     
   } else {
     
@@ -1261,7 +1239,7 @@ add.weplot <- function(x, y, type = "point", color = "black", size = 1, label = 
 }
 
 
-message("-- weplot loaded (version 1.31) --")
+message("-- weplot loaded (version 1.30) --")
 
 
 
