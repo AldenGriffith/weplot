@@ -567,6 +567,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
             y.mat <- TRUE
            
             if (is.null(ylab)) ylab <- attr(y,'name')
+            print(ylab)
             
           }
           # if(!is.null(attr(y,'name')) & is.null(ylab))  ylab <- attr(y,'name')
@@ -616,9 +617,16 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
           
           group <- TRUE
           
-          if(!is.null(attr(x,'matrix'))) y.mat <- TRUE
+          # if(!is.null(attr(x,'matrix'))) y.mat <- TRUE
           # if(!is.null(attr(x,'name')) & is.null(ylab))  ylab <- attr(x,'name')
           
+          
+          if(!is.null(attr(x,'matrix'))){
+            y.mat <- TRUE
+            
+            if (is.null(ylab)) ylab <- attr(x,'name')
+            
+          }
           
           if (is.null(xlab)) xlab <- "Index"
           if (is.null(ylab)) ylab <- ""
