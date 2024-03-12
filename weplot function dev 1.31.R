@@ -3,6 +3,7 @@
 # - Added argument hist.type ("stack", "side", "overlay")
 # - Removed weplot.Pop (honestly not sure why it's needed anymore?)
 # - Fixed an issue with ylab when y object is a matrix
+# - Defaults to line plot with y object is a matrix
 #
 # # # # # # # # #
 
@@ -51,6 +52,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
                    log = "", title = NULL, give.data = FALSE, error = "sd", error.width = 0.1,
                    commas = ""){
   
+  
   # # # Yes, the code below is UGLY, but it works...  # # #
   
   
@@ -78,6 +80,15 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   rlang::local_options(lifecycle_verbosity = "quiet")
   
   blue <- rgb(14, 40, 121, maxColorValue = 255)
+  
+  #helpful for setting matrix plots to lines unless specified
+  if (missing(type)){
+    no.type <- TRUE
+    orig.size <- size
+  } else {
+    no.type <- FALSE
+    orig.size <- size
+  }
   
   #gets input arguments
   args = as.list(match.call()[-1])
@@ -805,6 +816,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
     type <- gsub(" ", "", type)
     
     
+    
     switch(type,
            point = {geom <- geom_point},
            line = {geom <- geom_line},
@@ -852,8 +864,15 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
         
         #Y matrix
         
+        #line plot unless specified
+        if (no.type){
+          geom <- geom_line
+          size <- orig.size*0.5
+        }
+        
         # print(y.mat)
         if (is.null(color)) {
+          
           
           p <- p + geom(aes(group = Group), alpha = 1 - transparency, color = blue, size = size) +
             theme(legend.position = "none")
@@ -1096,7 +1115,7 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
   
   # return(d)
   
-  print(ylab)
+  # print(ylab)
   
   if (is.null(group.lab)) p <- p + theme(legend.title = element_blank())
   # if (!is.null(group.lab)) p <- p + theme(legend.title = element_blank())
