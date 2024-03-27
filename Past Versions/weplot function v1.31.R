@@ -1,11 +1,3 @@
-# v1.32 # # # # #
-#  
-# - Added back in weplot.MM (formerly weplot.Pop) for matrix models
-#
-# # # # # # # # #
-
-
-
 # v1.31 # # # # #
 #  
 # - Added argument hist.type ("stack", "side", "overlay")
@@ -1208,49 +1200,49 @@ weplot <- function(x = NULL, y = NULL, type = "point", data = NULL, group = FALS
 
 
 
-weplot.MM <- function(x = NULL, y = NULL, type = "point+line",
-                       xlab = "Time", ylab = NULL, ...){
-
-  #gets input arguments
-  args = as.list(match.call()[-1])
-  arg.names <- names(args)
-  args <- as.character(args)
-
-
-  #single argument x = N
-  if (is.null(y)){
-    X <- 1:ncol(x) - 1
-    y <- x
-
-    if(is.null(ylab)) ylab <- args[arg.names == "x"]
-    # message("no y")
-
-  } else {
-    X <- x
-    if(is.null(ylab)) ylab <- args[arg.names == "y"]
-
-  }
-
-
-
-  Y <- list()
-  for (i in 1:nrow(y)) Y[[i]] <- y[i,]
-  if (!is.null(rownames(y))) names(Y) <- rownames(y)
-
-  # message(str(Y,1))
-  # message(str(X,1))
-  # new.weplot <- weplot
-
-  weplot.Pop.Y <<- Y
-  weplot.Pop.X  <<- X
-
-  print(weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...))
-
-  rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
-
-
-
-}
+# weplot.Pop <- function(x = NULL, y = NULL, type = "point+line",
+#                        xlab = "Time", ylab = NULL, ...){
+#   
+#   #gets input arguments
+#   args = as.list(match.call()[-1])
+#   arg.names <- names(args) 
+#   args <- as.character(args)
+#   
+#   
+#   #single argument x = N
+#   if (is.null(y)){
+#     X <- 1:ncol(x) - 1
+#     y <- x
+#     
+#     if(is.null(ylab)) ylab <- args[arg.names == "x"]
+#     # message("no y")
+#     
+#   } else {
+#     X <- x
+#     if(is.null(ylab)) ylab <- args[arg.names == "y"]
+#     
+#   }
+#   
+#   
+#   
+#   Y <- list()
+#   for (i in 1:nrow(y)) Y[[i]] <- y[i,]
+#   if (!is.null(rownames(y))) names(Y) <- rownames(y)
+#   
+#   # message(str(Y,1))
+#   # message(str(X,1))
+#   # new.weplot <- weplot
+#   
+#   weplot.Pop.Y <<- Y
+#   weplot.Pop.X  <<- X
+#   
+#   print(weplot(x = weplot.Pop.X, y = weplot.Pop.Y, type = type, xlab = xlab, ylab = ylab, ...))
+#   
+#   rm("weplot.Pop.X", "weplot.Pop.Y", envir = .GlobalEnv)
+#   
+#   
+#   
+# }
 
 
 add.weplot <- function(x, y, type = "point", color = "black", size = 1, label = NULL, ...){
@@ -1296,7 +1288,7 @@ add.weplot <- function(x, y, type = "point", color = "black", size = 1, label = 
 }
 
 
-message("-- weplot loaded (version 1.32) --")
+message("-- weplot loaded (version 1.31) --")
 
 
 
