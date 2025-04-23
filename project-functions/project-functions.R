@@ -116,12 +116,15 @@ mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A), post.breed
     surv <- A.surv[,j]
     
     if (sum(surv) > 1) {
+      
       if (warnings){
-        message(paste("Looks like total survival for Stage", j, "is greater than 100% (clonal reproduction?)"))
-        message(paste("   -Values were adjusted to set survival to 100%"))
-        message(paste("   -You can disable this message with the argument: warning = FALSE"))
-        surv <- surv/sum(surv)
+        message(paste("Looks like total survival for Stage", j, "is greater than 1 (clonal reproduction?)"))
+        message(paste("   -Original survival =", sum(surv)))
+        message(paste("   -Values were adjusted to set survival to 1.0"))
+        message(paste("   -You can disable this message with the argument: warnings = FALSE"))
       }
+      
+      surv <- surv/sum(surv)
       
     }
     
