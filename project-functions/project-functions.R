@@ -89,13 +89,16 @@ N.start <- function(A, Total.N, round = FALSE){
 get.lam <- function(A) as.numeric(eigen(A)$values[1])
 
 
-mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A), post.breed = TRUE){
+mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A), post.breed = TRUE, warnings = TRUE){
+  
+  
   
   # # For testing
-  # repro.rows <- 1:2  #default = 1
-  # repro.cols <- 2:ncol(A)
-  # Nt <- rep(100, nrow(A))
-  # post.breed = TRUE
+  # A <- A.mat[[2]]
+  # repro.rows <- 1  #default = 1
+  # repro.cols <- 3:5
+  # Nt <- N[,1]
+  # post.breed = FALSE
   
   
   N.out <- Nt*0
@@ -109,9 +112,20 @@ mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A), post.breed
   
   for (j in 1:ncol(A)){
     
+    #probabilities of transitioning to different classes next year
+    surv <- A.surv[,j]
+    
+    if (sum(surv) > 1) {
+      message(paste("Looks like total survival for Stage", j, "is greater than 100% (clonal reproduction?)"))
+      message(paste("   -Values were adjusted to set survival to 100%"))
+      message(paste("   -You can disable this message with the argument: warning = FALSE"))
+      surv <- surv/sum(surv)
+      
+    }
+    
     #sample next year's class for each individual (0 = death)
     Next.Year <- sample(0:nrow(A), Nt[j], replace = TRUE,
-                        prob = c(1 - sum(A.surv[,j]), A.surv[,j]))
+                        prob = c(1 - sum(surv), surv))
     
     #Only survivors
     Next.Surv <- Next.Year[Next.Year > 0]
@@ -141,6 +155,6 @@ mat.dstoch <- function(A, Nt, repro.rows = 1, repro.cols = 2:ncol(A), post.breed
     }
   }
   
-  return(N.out)  
+  return(N.out)
   
 }
